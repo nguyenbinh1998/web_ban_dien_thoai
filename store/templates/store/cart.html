@@ -1,0 +1,84 @@
+{% extends "store/base.html" %}
+{% load store_tags %}
+{% load static %}
+{% load humanize %}
+{% block title %}
+    Your shopping cart
+{% endblock %}
+{% block content %}
+    <h1>Your shopping cart</h1>
+    <table class="cart">
+        <thead>
+            <tr>
+                <th>Image</th>
+                <th>Product</th>
+                <th>Quantity</th>
+                <th>Remove</th>
+                <th>Unit price</th>
+                <th>Price</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for product in products %}
+                <tr>
+                    <td>
+                        <a href="{{ product.get_absolute_url }}">
+                            <img src="{{ product.image.url }}">
+                        </a>
+                    </td>
+                    <td>
+                        {{ product.name }}
+                    </td>
+                    <td>{% get_quantity product request.session.cart %}</td>
+                    <td>
+                        <form action="{% url 'remove' product.id %}" method="post">
+                            <input type="submit" value="Remove">
+                            {% csrf_token %}
+                        </form>
+                    </td>
+                    <td>${{ product.price|intcomma }}</td>
+                    <td> ${% get_price product request.session.cart %}</td>
+                </tr>
+            {% endfor %}
+                <tr class="total">
+                    <td>Total</td>
+                    <td colspan="4"></td>
+                    <td>${% get_total_price products request.session.cart %}</td>
+                </tr>
+        </tbody>
+    </table>
+    <p class="text-right">
+        <a href="{% url 'product_list' %}" class="button light">Continue shopping</a>
+        <a href="#" class="button" data-toggle="modal" data-target="#exampleModal">Checkout</a>
+    </p>
+    <!-- Modal -->
+    <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel">Check Out Form</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+            </div>
+            <form action="" method="post">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="address">Address</label>
+                        <input type="text" name="address" id="address" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label for="phone">Phone</label>
+                        <input type="text" name="phone" id="phone" class="form-control">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="submit" class="btn btn-primary">Checkout</button>
+                </div>
+            </form>
+        </div>
+        </div>
+    </div>
+{% endblock %}
